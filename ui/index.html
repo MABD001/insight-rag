@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>insight-rag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">◈</div>
+      <div>
+        <div class="brand-name">insight-rag</div>
+        <div class="brand-sub">grounded retrieval</div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>System</h2>
+      <dl class="kv" id="health">
+        <dt>status</dt><dd><span class="dot pending"></span><span id="h-status">checking…</span></dd>
+        <dt>llm</dt><dd id="h-llm">—</dd>
+        <dt>embeddings</dt><dd id="h-emb">—</dd>
+        <dt>store</dt><dd id="h-store">—</dd>
+        <dt>reranker</dt><dd id="h-rerank">—</dd>
+        <dt>corpus</dt><dd id="h-corpus">—</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Retrieved this turn</h2>
+      <ol class="retrieved" id="retrieved">
+        <li class="empty">Ask a question to see what the retriever surfaced, and how it scored.</li>
+      </ol>
+    </section>
+
+    <section class="panel">
+      <h2>Try</h2>
+      <div class="suggestions">
+        <button class="suggestion" data-q="How long do refunds take to reach my payment method?">Refund timing</button>
+        <button class="suggestion" data-q="What does error code SB-4021 mean on a torque wrench?">Exact code lookup</button>
+        <button class="suggestion" data-q="What is the lead time for a pallet delivery?">Pallet lead time</button>
+        <button class="suggestion ghost" data-q="Does Northwind Supply accept payment in Bitcoin?">Unanswerable →  refuses</button>
+      </div>
+    </section>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1>Ask the corpus</h1>
+        <p class="muted">Answers are drawn only from indexed documents. Every claim carries a citation.</p>
+      </div>
+      <a class="repo-link" href="https://github.com/MABD001/insight-rag" target="_blank" rel="noopener">GitHub ↗</a>
+    </header>
+
+    <div class="thread" id="thread">
+      <div class="welcome">
+        <h2>Grounded answers, or none at all</h2>
+        <p>
+          This service runs hybrid retrieval (dense + BM25 fused with reciprocal rank fusion),
+          reranks the candidates, then checks whether the retrieved context actually covers the
+          question before generating. If it does not, it refuses instead of inventing an answer.
+        </p>
+        <p class="muted small">Pick a suggestion on the left, or type a question below.</p>
+      </div>
+    </div>
+
+    <form class="composer" id="composer" autocomplete="off">
+      <input id="question" type="text" placeholder="Ask about refunds, delivery, warranty or accounts…" required>
+      <button type="submit" id="send"><span>Ask</span></button>
+    </form>
+  </main>
+</div>
+
+<div class="citation-popover" id="popover" hidden>
+  <div class="pop-head"><span id="pop-label"></span><button id="pop-close" aria-label="Close">×</button></div>
+  <p id="pop-snippet"></p>
+  <div class="pop-foot">relevance <b id="pop-score"></b></div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

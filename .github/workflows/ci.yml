@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          uv venv --python ${{ matrix.python-version }}
+          uv pip install -e ".[dev]"
+
+      - name: Lint
+        run: uv run ruff check app tests eval scripts
+
+      - name: Test
+        # No secrets: the fake providers make the suite fully offline.
+        run: uv run pytest -q
+
+      - name: Evaluate retrieval quality
+        # Fails the build on a retrieval or refusal regression.
+        run: uv run python -m eval.run
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-py${{ matrix.python-version }}
+          path: eval/report.json
+          if-no-files-found: ignore
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t insight-rag:ci .
+      - name: Smoke test the image
+        run: |
+          docker run -d --name insight -p 8000:8000 insight-rag:ci
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/api/health > /dev/null; then
+              echo "healthy"; curl -s http://localhost:8000/api/health; exit 0
+            fi
+            sleep 2
+          done
+          echo "service did not become healthy"; docker logs insight; exit 1

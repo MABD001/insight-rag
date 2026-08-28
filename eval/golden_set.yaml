@@ -1,0 +1,117 @@
+# Golden evaluation set.
+#
+# `expect_source` names the document that must be retrieved for the question to
+# be answerable. `expect_terms` are strings that a correct answer must contain
+# verbatim — figures, codes and durations, not prose, so scoring stays objective.
+#
+# The `answerable: false` cases matter most. A RAG system that scores well on
+# answerable questions and hallucinates on the rest is worse than no system,
+# because users cannot tell the two apart.
+
+- id: refund-timing
+  question: How long do refunds take to reach my payment method?
+  expect_source: returns-policy.md
+  expect_terms: ["5 business days"]
+  answerable: true
+
+- id: refund-shipping-cost
+  question: Who pays return shipping if I simply changed my mind?
+  expect_source: returns-policy.md
+  expect_terms: ["customer"]
+  answerable: true
+
+- id: damaged-window
+  question: How quickly must transit damage be reported?
+  expect_source: returns-policy.md
+  expect_terms: ["48 hours"]
+  answerable: true
+
+- id: express-cutoff
+  question: What is the cut-off time for next working day delivery?
+  expect_source: shipping-guide.md
+  expect_terms: ["14:00"]
+  answerable: true
+
+- id: free-delivery-threshold
+  question: How much do I need to spend for free standard delivery?
+  expect_source: shipping-guide.md
+  expect_terms: ["75"]
+  answerable: true
+
+- id: pallet-lead-time
+  question: What is the lead time for a pallet delivery of heavy items?
+  expect_source: shipping-guide.md
+  expect_terms: ["5 to 7 working days"]
+  answerable: true
+
+- id: highlands-delay
+  question: Do deliveries to the Scottish Highlands take longer?
+  expect_source: shipping-guide.md
+  expect_terms: ["2 additional working days"]
+  answerable: true
+
+- id: error-code-sb4021
+  question: What does error code SB-4021 mean on a torque wrench?
+  expect_source: warranty-terms.md
+  expect_terms: ["calibration sensor"]
+  answerable: true
+  # Exact-identifier case: dense-only retrieval typically misses this because
+  # "SB-4021" carries almost no semantic signal. BM25 catches it, which is the
+  # whole argument for hybrid search.
+
+- id: extended-warranty
+  question: How do I extend the warranty on a power tool to 36 months?
+  expect_source: warranty-terms.md
+  expect_terms: ["28 days"]
+  answerable: true
+
+- id: hire-tool-warranty
+  question: What warranty applies to tools used on a commercial site?
+  expect_source: warranty-terms.md
+  expect_terms: ["12 months"]
+  answerable: true
+
+- id: battery-warranty
+  question: What is covered by the battery warranty?
+  expect_source: warranty-terms.md
+  expect_terms: ["12-month", "30%"]
+  answerable: true
+
+- id: credit-limit
+  question: What credit limit does a new trade account start on?
+  expect_source: account-management.md
+  expect_terms: ["2,500"]
+  answerable: true
+
+- id: volume-discount
+  question: What discount applies to orders over ten thousand pounds?
+  expect_source: account-management.md
+  expect_terms: ["12%"]
+  answerable: true
+
+- id: overdue-stop
+  question: How overdue does an account have to be before it is put on stop?
+  expect_source: account-management.md
+  expect_terms: ["14 days"]
+  answerable: true
+
+- id: user-roles
+  question: What roles can I assign to users on a trade account?
+  expect_source: account-management.md
+  expect_terms: ["Buyer", "Viewer"]
+  answerable: true
+
+# --- Unanswerable: the corpus contains nothing on these. Correct behaviour
+# --- is refusal, not a plausible-sounding guess.
+
+- id: unanswerable-cto
+  question: Who is the chief technology officer of Northwind Supply?
+  answerable: false
+
+- id: unanswerable-revenue
+  question: What was Northwind Supply's revenue last financial year?
+  answerable: false
+
+- id: unanswerable-crypto
+  question: Does Northwind Supply accept payment in Bitcoin?
+  answerable: false

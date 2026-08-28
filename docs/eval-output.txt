@@ -1,0 +1,24 @@
+insight-rag — evaluation
+  providers: llm=fake embeddings=fake store=memory
+  retrieval: dense_k=20 sparse_k=20 rrf_k=60 rerank_n=6
+  grounding: min_coverage=0.05 min_score=0.05
+  corpus:    18 cases (15 answerable, 3 unanswerable)
+
+  retrieval & safety — provider independent
+  Context recall       ████████████████████████ 100.00%
+  MRR                  ███████████████████████· 95.56%
+  Refusal accuracy     ████████████████████████ 100.00%
+  Hallucination rate   ························ 0.00%
+
+  answer quality — depends on llm=fake
+  Answer match         ██████████████████████·· 93.33%
+  Citation precision   ██████████████████······ 74.44%
+  Overall pass rate    ███████████████████████· 94.44%
+
+
+  p50 latency: 0.51 ms
+
+  1 case(s) needing attention:
+    · battery-warranty         recall=1 match=0.00
+
+  report written to eval/report.json
